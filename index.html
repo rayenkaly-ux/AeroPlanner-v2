@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroPlanner v2 - Frutiger Aero Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --aero-bg: #e2ecf5;
+            --panel-bg: rgba(255, 255, 255, 0.85);
+            --header-gradient: linear-gradient(to bottom, #d6e8fc 0%, #9bc5f8 50%, #6ab0f7 51%, #459af6 100%);
+            --header-text: #0b2545;
+            --border-glass: rgba(255, 255, 255, 0.9);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --primary-blue: #1d70b8;
+            --accent-glow: 0 0 10px rgba(69, 154, 246, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--aero-bg);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(255,255,255,0.9) 0%, rgba(200,225,250,0.5) 50%, rgba(160,200,240,0.8) 100%),
+                linear-gradient(135deg, #f0f7ff 0%, #cce2fd 100%);
+            background-attachment: fixed;
+            color: #222;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Top Header Bar */
+        .top-bar {
+            background: var(--header-gradient);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-glass), inset 0 1px 0 rgba(255,255,255,0.8);
+            margin-bottom: 20px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 24px;
+            color: #0b2545;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+        }
+
+        .logo-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--header-text);
+            text-shadow: 0 1px 1px rgba(255,255,255,0.6);
+        }
+
+        .clock-widget {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 6px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.9);
+            font-weight: 600;
+            color: #13395c;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Dashboard Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Glass Panel Base */
+        .panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 14px;
+            box-shadow: var(--shadow-glass);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: var(--header-gradient);
+            padding: 10px 16px;
+            font-weight: 700;
+            color: var(--header-text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.5);
+            text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+        }
+
+        .panel-body {
+            padding: 16px;
+        }
+
+        /* Widgets top row */
+        .widgets-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .widgets-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .widget-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 12px 16px;
+            border: 1px solid #cce0ff;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .widget-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #446;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .countdown-display {
+            font-size: 22px;
+            font-weight: bold;
+            color: #104f8c;
+        }
+
+        .athan-times {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            background: #eaf3ff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #bce0fd;
+        }
+
+        .athan-time-item {
+            text-align: center;
+        }
+
+        .athan-time-item span {
+            display: block;
+            font-size: 10px;
+            color: #557;
+            text-transform: uppercase;
+        }
+
+        /* Timetable Grid */
+        .timetable-grid {
+            display: grid;
+            grid-template-columns: 70px repeat(7, 1fr);
+            gap: 2px;
+            background: #bcd3f2;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 12px;
+        }
+
+        .time-cell, .day-header, .slot-cell {
+            background: #fff;
+            padding: 8px;
+            text-align: center;
+            min-height: 55px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .day-header {
+            background: linear-gradient(to bottom, #f0f7ff, #d2e5fc);
+            font-weight: bold;
+            color: #13395c;
+            border-bottom: 2px solid #9bbcf2;
+        }
+
+        .time-cell {
+            background: #eef5ff;
+            font-weight: 600;
+            color: #456;
+        }
+
+        .slot-cell {
+            background: #ffffff;
+            transition: background 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .slot-cell:hover {
+            background: #f0f6ff;
+        }
+
+        .scheduled-task {
+            background: linear-gradient(to bottom, #459af6, #1d70b8);
+            color: white;
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 11px;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            text-align: left;
+            overflow: hidden;
+            word-break: break-all;
+        }
+
+        /* Backlog & Gym Sections */
+        .section-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: linear-gradient(to bottom, #f8fbff, #d3e6fc);
+            border: 1px solid #9bbcf2;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #13395c;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(to bottom, #459af6, #1d70b8);
+            color: white;
+            border-color: #104f8c;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 12px;
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .media-card {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #bce0fd;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .media-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(29, 112, 184, 0.2);
+        }
+
+        .media-img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            background: #dceafc;
+        }
+
+        .media-info {
+            padding: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #235;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 6px;
+            background: #f0f6ff;
+            border-top: 1px solid #e1effc;
+        }
+
+        .action-icon {
+            font-size: 10px;
+            cursor: pointer;
+            color: #1d70b8;
+        }
+        .action-icon:hover {
+            color: #0b2545;
+        }
+
+        /* Action Buttons & Modals */
+        .btn-aero {
+            background: linear-gradient(to bottom, #6ab0f7, #2175cb);
+            color: white;
+            border: 1px solid #104f8c;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4);
+            transition: filter 0.2s;
+        }
+        .btn-aero:hover {
+            filter: brightness(1.1);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: #f0f6ff;
+            border: 1px solid white;
+            border-radius: 12px;
+            width: 400px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .modal h3 {
+            margin-bottom: 15px;
+            color: #0b2545;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #335;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #9bbcf2;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Top Header -->
+        <div class="top-bar">
+            <div class="logo-area">
+                <i class="fa-solid fa-cloud-sun logo-icon"></i>
+                <div class="logo-title">AeroPlanner v2</div>
+            </div>
+            <div class="clock-widget" id="live-clock">Loading time...</div>
+        </div>
+
+        <!-- Main Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Left Column: Timetable & Widgets -->
+            <div>
+                <!-- Widgets Row -->
+                <div class="widgets-row">
+                    <!-- Holiday Countdown -->
+                    <div class="widget-card">
+                        <div class="widget-title">
+                            <span>Holiday Countdown</span>
+                            <i class="fa-solid fa-umbrella-beach text-blue-500"></i>
+                        </div>
+                        <div class="countdown-display" id="holiday-countdown">-- Days remaining</div>
+                    </div>
+                    <!-- Tunis Athan Widget -->
+                    <div class="widget-card">
+                        <div class="widget-title">
+                            <span>Tunis Athan Prayer Times</span>
+                            <i class="fa-solid fa-mosque text-blue-500"></i>
+                        </div>
+                        <div class="athan-times">
+                            <div class="athan-time-item"><span>Fajr</span>05:12</div>
+                            <div class="athan-time-item"><span>Dhuhr</span>12:15</div>
+                            <div class="athan-time-item"><span>Asr</span>15:30</div>
+                            <div class="athan-time-item"><span>Maghrib</span>18:05</div>
+                            <div class="athan-time-item"><span>Isha</span>19:25</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Weekly Timetable Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span><i class="fa-solid fa-calendar-days"></i> Dynamic Weekly Timetable</span>
+                        <button class="btn-aero" onclick="resetTimetable()">Clear Timetable</button>
+                    </div>
+                    <div class="panel-body">
+                        <div class="timetable-grid" id="timetable-grid">
+                            <!-- Generated via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Gym & Entertainment Backlogs & Exams -->
+            <div>
+                <!-- Exam Tracker Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span><i class="fa-solid fa-graduation-cap"></i> Exam Tracker</span>
+                        <button class="btn-aero" onclick="openModal('exam')">+ Add Exam</button>
+                    </div>
+                    <div class="panel-body" id="exam-list" style="max-height: 200px; overflow-y: auto;">
+                        <!-- Exams list -->
+                    </div>
+                </div>
+
+                <!-- Gym Program Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span><i class="fa-solid fa-dumbbell"></i> Gym Program</span>
+                        <button class="btn-aero" onclick="openModal('gym')">+ Add Exercise</button>
+                    </div>
+                    <div class="panel-body">
+                        <div class="cards-grid" id="gym-cards">
+                            <!-- Gym cards -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entertainment Backlog Panel (Games, Movies, Shows, Anime) -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span><i class="fa-solid fa-film"></i> Media Backlog</span>
+                        <button class="btn-aero" onclick="openModal('media')">+ Add Media</button>
+                    </div>
+                    <div class="panel-body">
+                        <div class="section-tabs">
+                            <button class="tab-btn active" onclick="switchMediaTab('game', this)">Games</button>
+                            <button class="tab-btn" onclick="switchMediaTab('movie', this)">Movies</button>
+                            <button class="tab-btn" onclick="switchMediaTab('show', this)">Shows</button>
+                            <button class="tab-btn" onclick="switchMediaTab('anime', this)">Anime</button>
+                        </div>
+                        <div class="cards-grid" id="media-cards">
+                            <!-- Media cards -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Modal for Adding Items -->
+    <div class="modal-overlay" id="add-modal">
+        <div class="modal">
+            <h3 id="modal-title">Add New Item</h3>
+            <div class="form-group">
+                <label>Item Name / Title</label>
+                <input type="text" id="modal-name" placeholder="e.g., Bench Press or GTA V">
+            </div>
+            <div class="form-group" id="modal-cat-group">
+                <label>Category / Platform</label>
+                <select id="modal-category">
+                    <option value="game">PC / Console Game</option>
+                    <option value="movie">Movie</option>
+                    <option value="show">TV Show</option>
+                    <option value="anime">Anime</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Cover Art / Image (Upload File or URL)</label>
+                <input type="file" id="modal-file" accept="image/*" style="margin-bottom: 6px;">
+                <input type="text" id="modal-img-url" placeholder="Or paste image URL here">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-aero" style="background:#aaa; border-color:#888;" onclick="closeModal()">Cancel</button>
+                <button class="btn-aero" onclick="saveModalItem()">Save Item</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Live Clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('live-clock').innerText = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+        }, 1000);
+
+        // Holiday Countdown (e.g., Nov 15, 2026)
+        function updateCountdown() {
+            const holidayDate = new Date('2026-11-15T00:00:00');
+            const diff = holidayDate - new Date();
+            const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('holiday-countdown').innerText = days > 0 ? `${days} Days Left` : 'Holiday Active!';
+        }
+        updateCountdown();
+
+        // Data Storage & State
+        let appData = JSON.parse(localStorage.getItem('aeroplanner_v2')) || {
+            gym: [
+                { name: 'Barbell Bench Press', img: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=300', sets: '4 sets x 8-10 reps' },
+                { name: 'Lat Pulldown', img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=300', sets: '3 sets x 10-12 reps' }
+            ],
+            media: {
+                game: [
+                    { name: 'Pokémon Emerald', img: 'https://images.unsplash.com/photo-1612287233202-b51a3ed6ce1c?w=300', type: 'game' },
+                    { name: 'Grand Theft Auto V', img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=300', type: 'game' }
+                ],
+                movie: [{ name: 'Interstellar', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=300', type: 'movie' }],
+                show: [{ name: 'Breaking Bad', img: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=300', type: 'show' }],
+                anime: [{ name: "JoJo's Bizarre Adventure", img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=300', type: 'anime' }]
+            },
+            exams: [
+                { name: 'English Exam', date: 'Nov 2, 2026', priority: 'High' },
+                { name: 'Physics Test', date: 'Nov 4, 2026', priority: 'Medium' }
+            ],
+            timetable: {},
+            currentMediaTab: 'game'
+        };
+
+        function saveData() {
+            localStorage.setItem('aeroplanner_v2', JSON.stringify(appData));
+        }
+
+        // Render Timetable (Today to next Sunday)
+        function renderTimetable() {
+            const grid = document.getElementById('timetable-grid');
+            grid.innerHTML = '';
+
+            // Header row
+            const days = ['Time', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            days.forEach(d => {
+                const header = document.createElement('div');
+                header.className = 'day-header';
+                header.innerText = d;
+                grid.appendChild(header);
+            });
+
+            // Time slots (8 AM to 8 PM)
+            for (let hour = 8; hour <= 20; hour++) {
+                const timeCell = document.createElement('div');
+                timeCell.className = 'time-cell';
+                timeCell.innerText = `${hour}:00`;
+                grid.appendChild(timeCell);
+
+                for (let d = 1; d <= 7; d++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'slot-cell';
+                    const slotKey = `${d}-${hour}`;
+                    
+                    if (appData.timetable[slotKey]) {
+                        const task = document.createElement('div');
+                        task.className = 'scheduled-task';
+                        task.innerText = appData.timetable[slotKey];
+                        slot.appendChild(task);
+                    }
+
+                    slot.onclick = () => {
+                        const taskName = prompt('Enter task or activity for this slot:');
+                        if (taskName) {
+                            appData.timetable[slotKey] = taskName;
+                            saveData();
+                            renderTimetable();
+                        }
+                    };
+                    grid.appendChild(slot);
+                }
+            }
+        }
+
+        function resetTimetable() {
+            if (confirm('Clear all scheduled slots?')) {
+                appData.timetable = {};
+                saveData();
+                renderTimetable();
+            }
+        }
+
+        // Render Gym Cards
+        function renderGym() {
+            const container = document.getElementById('gym-cards');
+            container.innerHTML = '';
+            appData.gym.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'media-card';
+                card.innerHTML = `
+                    <img src="${item.img}" class="media-img" alt="${item.name}">
+                    <div class="media-info">${item.name}</div>
+                    <div class="card-actions">
+                        <span class="action-icon" onclick="editGym(${index})"><i class="fa-solid fa-pen"></i> Edit</span>
+                        <span class="action-icon" onclick="deleteGym(${index})"><i class="fa-solid fa-trash"></i></span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Render Media Backlog
+        function renderMedia() {
+            const container = document.getElementById('media-cards');
+            container.innerHTML = '';
+            const list = appData.media[appData.currentMediaTab] || [];
+            
+            list.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'media-card';
+                card.innerHTML = `
+                    <img src="${item.img}" class="media-img" alt="${item.name}">
+                    <div class="media-info">${item.name}</div>
+                    <div class="card-actions">
+                        <span class="action-icon" onclick="scheduleTask('${item.name}')"><i class="fa-solid fa-calendar-plus"></i> Schedule</span>
+                        <span class="action-icon" onclick="deleteMedia(${index})"><i class="fa-solid fa-trash"></i></span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function switchMediaTab(tab, btn) {
+            appData.currentMediaTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderMedia();
+        }
+
+        // Render Exams
+        function renderExams() {
+            const container = document.getElementById('exam-list');
+            container.innerHTML = '';
+            appData.exams.forEach((ex, idx) => {
+                const item = document.createElement('div');
+                item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; padding:8px 12px; margin-bottom:6px; border-radius:6px; border:1px solid #cce0ff; font-size:12px;';
+                item.innerHTML = `
+                    <div><strong>${ex.name}</strong> - <span style="color:#557;">${ex.date}</span></div>
+                    <button class="btn-aero" style="padding:2px 6px; font-size:10px; background:#d9534f; border-color:#b52b27;" onclick="deleteExam(${idx})">Delete</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Modal Management
+        let activeModalType = 'media';
+        function openModal(type) {
+            activeModalType = type;
+            document.getElementById('add-modal').style.display = 'flex';
+            document.getElementById('modal-name').value = '';
+            document.getElementById('modal-img-url').value = '';
+            document.getElementById('modal-file').value = '';
+
+            const catGroup = document.getElementById('modal-cat-group');
+            if (type === 'gym') {
+                document.getElementById('modal-title').innerText = 'Add Gym Exercise';
+                catGroup.style.display = 'none';
+            } else if (type === 'exam') {
+                document.getElementById('modal-title').innerText = 'Add Upcoming Exam';
+                catGroup.style.display = 'none';
+            } else {
+                document.getElementById('modal-title').innerText = 'Add Media (Game, Movie, Show, Anime)';
+                catGroup.style.display = 'block';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('add-modal').style.display = 'none';
+        }
+
+        function saveModalItem() {
+            const name = document.getElementById('modal-name').value.trim();
+            if (!name) {
+                alert('Please enter a name.');
+                return;
+            }
+
+            const fileInput = document.getElementById('modal-file');
+            let imgUrl = document.getElementById('modal-img-url').value.trim();
+
+            const finishSave = (finalImg) => {
+                const fallbackImg = finalImg || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300';
+                
+                if (activeModalType === 'gym') {
+                    appData.gym.push({ name, img: fallbackImg, sets: '3 sets x 10 reps' });
+                    renderGym();
+                } else if (activeModalType === 'exam') {
+                    appData.exams.push({ name, date: 'Upcoming', priority: 'High' });
+                    renderExams();
+                } else {
+                    const cat = document.getElementById('modal-category').value;
+                    if (!appData.media[cat]) appData.media[cat] = [];
+                    appData.media[cat].push({ name, img: fallbackImg, type: cat });
+                    renderMedia();
+                }
+                saveData();
+                closeModal();
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    finishSave(e.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                finishSave(imgUrl);
+            }
+        }
+
+        function deleteGym(index) {
+            appData.gym.splice(index, 1);
+            saveData();
+            renderGym();
+        }
+
+        function deleteMedia(index) {
+            appData.media[appData.currentMediaTab].splice(index, 1);
+            saveData();
+            renderMedia();
+        }
+
+        function deleteExam(index) {
+            appData.exams.splice(index, 1);
+            saveData();
+            renderExams();
+        }
+
+        function scheduleTask(taskName) {
+            const day = prompt('Enter day number to schedule (1 = Mon, 7 = Sun):', '1');
+            const hour = prompt('Enter hour (8 to 20):', '10');
+            if (day && hour) {
+                appData.timetable[`${day}-${hour}`] = taskName;
+                saveData();
+                renderTimetable();
+                alert(`Scheduled "${taskName}" successfully!`);
+            }
+        }
+
+        // Initial Render
+        renderTimetable();
+        renderGym();
+        renderMedia();
+        renderExams();
+    </script>
+</body>
+</html>
